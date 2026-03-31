@@ -43,36 +43,18 @@ CINEMAS = ["CGV Grand Indonesia","XXI Plaza Senayan","Cinepolis Kota Kasablanka"
 SEAT_PRICE = {"Reguler":45000,"Premium":75000,"IMAX":95000,"4DX":110000}
 
 # ── DATABASE ───────────────────────────────────────────────────────────────────
-_DB = None
+_DB = {
+    "users": [], "bookings": [],
+    "movies": list(DEFAULT_MOVIES),
+    "admin": {"username": "admin", "password": hashlib.md5(b"admin123").hexdigest()}
+}
 
 def get_db():
-    global _DB
-    if _DB is None:
-        db_path = os.path.join(BASE_DIR, 'database.json')
-        if os.path.exists(db_path):
-            try:
-                with open(db_path) as f:
-                    _DB = json.load(f)
-            except:
-                _DB = None
-        if _DB is None:
-            _DB = {
-                "users": [], "bookings": [],
-                "movies": DEFAULT_MOVIES,
-                "admin": {"username": "admin", "password": hashlib.md5(b"admin123").hexdigest()}
-            }
-    if 'movies' not in _DB:
-        _DB['movies'] = DEFAULT_MOVIES
     return _DB
 
 def save_db(data):
     global _DB
     _DB = data
-    db_path = os.path.join(BASE_DIR, 'database.json')
-    try:
-        with open(db_path, 'w') as f: json.dump(data, f, indent=2)
-    except:
-        pass
 
 def get_movies():
     return get_db()['movies']
@@ -282,4 +264,13 @@ def booking(movie_id):
               <label>Jam Tayang</label>
               <input type="hidden" name="showtime" id="timeInp" required/>
               <div style="display:flex;gap:.6rem;flex-wrap:wrap;">{time_btns}</div>
-            </div
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:1.25rem;">
+            <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;margin-bottom:1.25rem;">💺 Tipe Kursi</h3>
+            <input type="hidden" name="seat_type" id="typeInp" value="Reguler"/>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">{type_btns}</div>
+          </div>
+          <div class="card">
+            <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;margin-bottom:1rem;">🪑 Pilih Kursi</h3>
+            <div style="background:linear-gr
