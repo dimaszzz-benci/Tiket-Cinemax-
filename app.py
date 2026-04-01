@@ -5,6 +5,11 @@ import json, os, hashlib
 app = Flask(__name__)
 app.secret_key = 'bioskop_secret_2024'
 
+# Midtrans Sandbox Keys
+MIDTRANS_SERVER_KEY = 'Mid-server-UWdwnCZyJi4yuj1jUvHaCKjq'
+MIDTRANS_CLIENT_KEY = 'Mid-client-CnZrBGXckbxkkT3-'
+MIDTRANS_BASE_URL = 'https://app.sandbox.midtrans.com/snap/v1/transactions'
+
 # Fix path - compatible Vercel & Pydroid
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 try:
@@ -505,20 +510,13 @@ def payment(booking_id, method=''):
         <div><div style="color:#8888aa;font-size:.9rem;">Total Pembayaran</div><div style="color:#8888aa;font-size:.8rem;">{len(bk['seats'])} kursi × {bk['seat_type']}</div></div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:#e8173a;">{fmt_rp(bk['total'])}</div>
       </div>
-      <button class="btn btn-red" style="width:100%;justify-content:center;font-size:1.05rem;padding:.9rem;" onclick="konfirmasiBayar()">
-        💳 Konfirmasi Pembayaran
+      <button class="btn btn-red" style="width:100%;justify-content:center;font-size:1.05rem;padding:.9rem;" id="pay-btn" onclick="bayarSekarang()">
+        💳 Bayar Sekarang via Midtrans
       </button>
       <div style="text-align:center;margin-top:1rem;"><a href="/my-tickets" style="color:#8888aa;font-size:.9rem;">Lihat semua tiket saya →</a></div>
     </div>
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-CnZrBGXckbxkkT3-"></script>
     <script>
-    function selPay(el,type){{
-      document.querySelectorAll('[onclick^="selPay"]').forEach(e=>e.style.borderColor='rgba(255,255,255,.1)');
-      el.style.borderColor='#e8173a';
-      ['qris','gopay','va','transfer','minimarket','kartu'].forEach(t=>{{
-        document.getElementById('pay-'+t).style.display='none';
-      }});
-      document.getElementById('pay-'+type).style.display='block';
-    }}
     function copyVA(bank,num){{
       navigator.clipboard.writeText(num).then(()=>alert('✅ Nomor VA '+bank+' berhasil disalin!')).catch(()=>alert('Nomor VA '+bank+': '+num));
     }}
@@ -526,11 +524,76 @@ def payment(booking_id, method=''):
       let v=el.value.replace(/\D/g,'').substring(0,16);
       el.value=v.replace(/(\d{{4}})/g,'$1 ').trim();
     }}
-    function konfirmasiBayar(){{
-      alert('✅ Pembayaran berhasil dikonfirmasi!\n\nTiket kamu sudah aktif. Selamat menikmati film!');
-      window.location.href='/my-tickets';
+    function bayarSekarang(){{
+      fetch('/create-payment/{bk["id"]}', {{method:'POST'}})
+        .then(r=>r.json())
+        .then(data=>{{
+          if(data.token){{
+            snap.pay(data.token, {{
+              onSuccess: function(result){{
+                alert('✅ Pembayaran berhasil!');
+                window.location.href='/my-tickets';
+              }},
+              onPending: function(result){{
+                alert('⏳ Pembayaran pending. Selesaikan pembayaranmu.');
+              }},
+              onError: function(result){{
+                alert('❌ Pembayaran gagal. Coba lagi.');
+              }},
+              onClose: function(){{
+                alert('Popup ditutup sebelum menyelesaikan pembayaran.');
+              }}
+            }});
+          }} else {{
+            alert('Gagal membuat transaksi: ' + (data.error || 'Unknown error'));
+          }}
+        }})
+        .catch(e=>alert('Error: '+e));
     }}
     </script>
+
+# ── CREATE MIDTRANS PAYMENT ───────────────────────────────────────────────────
+@app.route('/create-payment/<booking_id>', methods=['POST'])
+def create_payment(booking_id):
+    import urllib.request, base64
+    bk = session.get('last_booking')
+    if not bk or bk['id'] != booking_id:
+        return {'error': 'Booking tidak ditemukan'}, 404
+    
+    payload = {
+        "transaction_details": {
+            "order_id": bk['id'],
+            "gross_amount": bk['total']
+        },
+        "customer_details": {
+            "first_name": bk['user'],
+            "email": bk['user'] + "@cinemax.com"
+        },
+        "item_details": [{
+            "id": str(bk.get('movie','film')),
+            "price": bk['total'],
+            "quantity": 1,
+            "name": f"Tiket {bk['movie']} - {', '.join(bk['seats'])}"
+        }]
+    }
+    
+    try:
+        import json as _json
+        data = _json.dumps(payload).encode()
+        auth = base64.b64encode(f"{MIDTRANS_SERVER_KEY}:".encode()).decode()
+        req = urllib.request.Request(
+            MIDTRANS_BASE_URL,
+            data=data,
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': f'Basic {auth}'
+            }
+        )
+        with urllib.request.urlopen(req) as resp:
+            result = _json.loads(resp.read())
+            return {'token': result.get('token'), 'redirect_url': result.get('redirect_url')}
+    except Exception as e:
+        return {'error': str(e)}, 500
 
 # ── MY TICKETS ─────────────────────────────────────────────────────────────────
 @app.route('/my-tickets')
