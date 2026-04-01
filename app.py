@@ -1,4 +1,3 @@
-# v5
 from flask import Flask, request, redirect, session, make_response
 from datetime import datetime
 import json, os, hashlib
@@ -347,7 +346,8 @@ def booking(movie_id):
 
 # ── PAYMENT ────────────────────────────────────────────────────────────────────
 @app.route('/payment/<booking_id>')
-def payment(booking_id):
+@app.route('/payment/<booking_id>/<method>')
+def payment(booking_id, method=''):
     bk = session.get('last_booking')
     if not bk or bk['id'] != booking_id: return redirect('/')
     seat_tags = ''.join(f'<span style="background:rgba(232,23,58,.15);border:1px solid rgba(232,23,58,.3);color:#e8173a;padding:.3rem .65rem;border-radius:6px;font-size:.85rem;font-weight:700;">{s}</span>' for s in bk['seats'])
@@ -385,16 +385,16 @@ def payment(booking_id):
       </div>
       <h2 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;margin-bottom:1.25rem;">💳 Pilih Metode Pembayaran</h2>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.5rem;">
-        <div onclick="selPay(this,'qris')" style="padding:1rem;border:2px solid rgba(255,255,255,.1);border-radius:12px;cursor:pointer;text-align:center;transition:all .2s;"><div style='font-size:1.6rem;margin-bottom:.25rem;'>💰</div><div style='font-size:.8rem;font-weight:600;'>QRIS</div></div>
-        <div onclick="selPay(this,'gopay')" style="padding:1rem;border:2px solid rgba(255,255,255,.1);border-radius:12px;cursor:pointer;text-align:center;transition:all .2s;"><div style='font-size:1.6rem;margin-bottom:.25rem;'>📱</div><div style='font-size:.8rem;font-weight:600;'>GoPay/OVO</div></div>
-        <div onclick="selPay(this,'va')" style="padding:1rem;border:2px solid rgba(255,255,255,.1);border-radius:12px;cursor:pointer;text-align:center;transition:all .2s;"><div style='font-size:1.6rem;margin-bottom:.25rem;'>🏦</div><div style='font-size:.8rem;font-weight:600;'>Virtual Account</div></div>
-        <div onclick="selPay(this,'transfer')" style="padding:1rem;border:2px solid rgba(255,255,255,.1);border-radius:12px;cursor:pointer;text-align:center;transition:all .2s;"><div style='font-size:1.6rem;margin-bottom:.25rem;'>💳</div><div style='font-size:.8rem;font-weight:600;'>Transfer Bank</div></div>
-        <div onclick="selPay(this,'minimarket')" style="padding:1rem;border:2px solid rgba(255,255,255,.1);border-radius:12px;cursor:pointer;text-align:center;transition:all .2s;"><div style='font-size:1.6rem;margin-bottom:.25rem;'>🏪</div><div style='font-size:.8rem;font-weight:600;'>Minimarket</div></div>
-        <div onclick="selPay(this,'kartu')" style="padding:1rem;border:2px solid rgba(255,255,255,.1);border-radius:12px;cursor:pointer;text-align:center;transition:all .2s;"><div style='font-size:1.6rem;margin-bottom:.25rem;'>💎</div><div style='font-size:.8rem;font-weight:600;'>Kartu Kredit</div></div>
+        <a href="/payment/{bk['id']}/qris" style="padding:1rem;border:2px solid {'rgba(255,215,0,.5)' if method=='qris' else 'rgba(255,255,255,.1)'};border-radius:12px;cursor:pointer;text-align:center;text-decoration:none;color:#f0f0f8;display:block;"><div style='font-size:1.6rem;margin-bottom:.25rem;'>💰</div><div style='font-size:.8rem;font-weight:600;'>QRIS</div></a>
+        <a href="/payment/{bk['id']}/gopay" style="padding:1rem;border:2px solid {'rgba(0,174,214,.5)' if method=='gopay' else 'rgba(255,255,255,.1)'};border-radius:12px;cursor:pointer;text-align:center;text-decoration:none;color:#f0f0f8;display:block;"><div style='font-size:1.6rem;margin-bottom:.25rem;'>📱</div><div style='font-size:.8rem;font-weight:600;'>GoPay/OVO</div></a>
+        <a href="/payment/{bk['id']}/va" style="padding:1rem;border:2px solid {'rgba(59,130,246,.5)' if method=='va' else 'rgba(255,255,255,.1)'};border-radius:12px;cursor:pointer;text-align:center;text-decoration:none;color:#f0f0f8;display:block;"><div style='font-size:1.6rem;margin-bottom:.25rem;'>🏦</div><div style='font-size:.8rem;font-weight:600;'>Virtual Account</div></a>
+        <a href="/payment/{bk['id']}/transfer" style="padding:1rem;border:2px solid {'rgba(52,211,153,.5)' if method=='transfer' else 'rgba(255,255,255,.1)'};border-radius:12px;cursor:pointer;text-align:center;text-decoration:none;color:#f0f0f8;display:block;"><div style='font-size:1.6rem;margin-bottom:.25rem;'>💳</div><div style='font-size:.8rem;font-weight:600;'>Transfer Bank</div></a>
+        <a href="/payment/{bk['id']}/minimarket" style="padding:1rem;border:2px solid {'rgba(249,115,22,.5)' if method=='minimarket' else 'rgba(255,255,255,.1)'};border-radius:12px;cursor:pointer;text-align:center;text-decoration:none;color:#f0f0f8;display:block;"><div style='font-size:1.6rem;margin-bottom:.25rem;'>🏪</div><div style='font-size:.8rem;font-weight:600;'>Minimarket</div></a>
+        <a href="/payment/{bk['id']}/kartu" style="padding:1rem;border:2px solid {'rgba(167,139,250,.5)' if method=='kartu' else 'rgba(255,255,255,.1)'};border-radius:12px;cursor:pointer;text-align:center;text-decoration:none;color:#f0f0f8;display:block;"><div style='font-size:1.6rem;margin-bottom:.25rem;'>💎</div><div style='font-size:.8rem;font-weight:600;'>Kartu Kredit</div></a>
       </div>
 
       <!-- PAYMENT DETAIL BOXES -->
-      <div id="pay-qris" style="display:none;background:#181828;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;text-align:center;">
+      <div id="pay-qris" style="display:{'block' if method=='qris' else 'none'};background:#181828;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;text-align:center;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;margin-bottom:1rem;color:#ffd700;">💰 Bayar via QRIS</div>
         <div style="background:white;padding:1rem;border-radius:12px;display:inline-block;margin-bottom:1rem;">
           <svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
@@ -424,7 +424,7 @@ def payment(booking_id):
         <p style="color:#ffd700;font-size:.8rem;margin-top:.5rem;">⏱ QR berlaku 15 menit</p>
       </div>
 
-      <div id="pay-gopay" style="display:none;background:#181828;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
+      <div id="pay-gopay" style="display:{'block' if method=='gopay' else 'none'};background:#181828;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;margin-bottom:1rem;color:#00aed6;">📱 Bayar via GoPay / OVO</div>
         <div style="background:#11111e;border-radius:10px;padding:1rem;margin-bottom:.75rem;">
           <div style="font-size:.8rem;color:#8888aa;margin-bottom:.25rem;">Nomor GoPay / OVO Tujuan</div>
@@ -437,7 +437,7 @@ def payment(booking_id):
         <p style="color:#8888aa;font-size:.8rem;margin-top:1rem;">Buka aplikasi GoPay/OVO → Transfer → masukkan nomor di atas</p>
       </div>
 
-      <div id="pay-va" style="display:none;background:#181828;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
+      <div id="pay-va" style="display:{'block' if method=='va' else 'none'};background:#181828;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;margin-bottom:1rem;color:#3b82f6;">🏦 Bayar via Virtual Account</div>
         <div style="display:grid;gap:.75rem;">
           <div style="background:#11111e;border-radius:10px;padding:1rem;cursor:pointer;" onclick="copyVA('BCA','1234567890123456')">
@@ -462,7 +462,7 @@ def payment(booking_id):
         <p style="color:#8888aa;font-size:.8rem;margin-top:1rem;">Klik nomor untuk menyalin. Masukkan nominal tepat sesuai tagihan.</p>
       </div>
 
-      <div id="pay-transfer" style="display:none;background:#181828;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
+      <div id="pay-transfer" style="display:{'block' if method=='transfer' else 'none'};background:#181828;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;margin-bottom:1rem;color:#34d399;">💳 Transfer Bank</div>
         <div style="background:#11111e;border-radius:10px;padding:1rem;margin-bottom:.75rem;">
           <div style="font-size:.8rem;color:#8888aa;margin-bottom:.25rem;">Bank BCA</div>
@@ -477,7 +477,7 @@ def payment(booking_id):
         <p style="color:#fbbf24;font-size:.8rem;margin-top:1rem;">⚠️ Transfer tepat sesuai nominal tagihan</p>
       </div>
 
-      <div id="pay-minimarket" style="display:none;background:#181828;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
+      <div id="pay-minimarket" style="display:{'block' if method=='minimarket' else 'none'};background:#181828;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;margin-bottom:1rem;color:#f97316;">🏪 Bayar di Minimarket</div>
         <div style="background:#11111e;border-radius:10px;padding:1.25rem;text-align:center;margin-bottom:.75rem;">
           <div style="font-size:.8rem;color:#8888aa;margin-bottom:.5rem;">Kode Pembayaran</div>
@@ -491,7 +491,7 @@ def payment(booking_id):
         <p style="color:#8888aa;font-size:.8rem;margin-top:1rem;">Tunjukkan kode ini ke kasir minimarket terdekat</p>
       </div>
 
-      <div id="pay-kartu" style="display:none;background:#181828;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
+      <div id="pay-kartu" style="display:{'block' if method=='kartu' else 'none'};background:#181828;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;margin-bottom:1rem;color:#a78bfa;">💎 Kartu Kredit / Debit</div>
         <div class="form-group"><label>Nomor Kartu</label><input type="text" placeholder="1234 5678 9012 3456" maxlength="19" oninput="fmtCard(this)" style="font-size:1.1rem;letter-spacing:2px;"/></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
