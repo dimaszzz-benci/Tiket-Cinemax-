@@ -1,52 +1,158 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Dashboard</title>
+    <title>Admin Dashboard - Cinemax</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0b0f1a;
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #ff2e63;
+            margin-bottom: 10px;
+        }
+
+        .menu {
+            margin-bottom: 20px;
+        }
+
+        .menu a {
+            text-decoration: none;
+            background: linear-gradient(45deg,#ff2e63,#ff6a00);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 6px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .menu a:hover {
+            opacity: 0.8;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background: #111827;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #ff2e63;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #222;
+        }
+
+        tr:hover {
+            background: #1f2937;
+        }
+
+        .btn-edit {
+            background: #3b82f6;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .qr-box {
+            margin-top: 30px;
+            background: #111827;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        img {
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+    </style>
+
 </head>
+
 <body>
 
-<h1>Dashboard Admin</h1>
+<h1>🎬 Admin Dashboard Cinemax</h1>
 
-<a href="/admin/add">Tambah Film</a> |
-<a href="/admin/upload-qr">Upload QR</a>
-
-<hr>
+<div class="menu">
+    <a href="/admin/add">+ Tambah Film</a>
+    <a href="/admin/upload-qr">⬆ Upload QR</a>
+</div>
 
 <h2>Daftar Film</h2>
 
-<table border="1">
-    <tr>
-        <th>ID</th>
-        <th>Judul</th>
-        <th>Genre</th>
-        <th>Harga</th>
-        <th>Aksi</th>
-    </tr>
+<table>
 
-    {% for movie in movies %}
-    <tr>
-        <td>{{ movie.id }}</td>
-        <td>{{ movie.title }}</td>
-        <td>{{ movie.genre }}</td>
-        <td>{{ movie.price }}</td>
-        <td>
-            <a href="/admin/edit/{{ movie.id }}">Edit</a> |
-            <a href="/admin/delete/{{ movie.id }}">Delete</a>
-        </td>
-    </tr>
-    {% endfor %}
+<tr>
+    <th>ID</th>
+    <th>Judul</th>
+    <th>Genre</th>
+    <th>Harga</th>
+    <th>Aksi</th>
+</tr>
+
+{% for movie in movies %}
+
+<tr>
+    <td>{{ movie.id }}</td>
+    <td>{{ movie.title }}</td>
+    <td>{{ movie.genre }}</td>
+    <td>Rp {{ movie.price }}</td>
+
+    <td>
+        <a class="btn-edit"
+           href="/admin/edit/{{ movie.id }}">
+           Edit
+        </a>
+
+        <a class="btn-delete"
+           href="/admin/delete/{{ movie.id }}">
+           Delete
+        </a>
+    </td>
+
+</tr>
+
+{% endfor %}
 
 </table>
 
-<hr>
+<div class="qr-box">
 
 <h2>QR Pembayaran</h2>
 
 {% if qr_image %}
-    <img src="/static/qr/{{ qr_image }}" width="200">
+
+<img src="/static/qr/{{ qr_image }}" width="200">
+
 {% else %}
-    <p>QR belum diupload</p>
+
+<p>QR belum diupload</p>
+
 {% endif %}
+
+</div>
 
 </body>
 </html>
