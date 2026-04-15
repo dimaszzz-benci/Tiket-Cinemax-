@@ -5,7 +5,7 @@
 </head>
 <body>
 
-<h1>Dashboard Admin 🎬</h1>
+<h1>Dashboard Admin</h1>
 
 <a href="/admin/add">Tambah Film</a> |
 <a href="/admin/upload-qr">Upload QR</a>
@@ -15,27 +15,26 @@
 <h2>Daftar Film</h2>
 
 <table border="1">
-<tr>
-    <th>ID</th>
-    <th>Judul</th>
-    <th>Genre</th>
-    <th>Harga</th>
-    <th>Aksi</th>
-</tr>
+    <tr>
+        <th>ID</th>
+        <th>Judul</th>
+        <th>Genre</th>
+        <th>Harga</th>
+        <th>Aksi</th>
+    </tr>
 
-{% for movie in movies %}
-<tr>
-<td>{{ movie.id }}</td>
-<td>{{ movie.title }}</td>
-<td>{{ movie.genre }}</td>
-<td>{{ movie.price }}</td>
-<td>
-<a href="/admin/edit/{{ movie.id }}">Edit</a>
-|
-<a href="/admin/delete/{{ movie.id }}">Delete</a>
-</td>
-</tr>
-{% endfor %}
+    {% for movie in movies %}
+    <tr>
+        <td>{{ movie.id }}</td>
+        <td>{{ movie.title }}</td>
+        <td>{{ movie.genre }}</td>
+        <td>{{ movie.price }}</td>
+        <td>
+            <a href="/admin/edit/{{ movie.id }}">Edit</a> |
+            <a href="/admin/delete/{{ movie.id }}">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
 
 </table>
 
@@ -44,9 +43,9 @@
 <h2>QR Pembayaran</h2>
 
 {% if qr_image %}
-<img src="/static/qr/{{ qr_image }}" width="200">
+    <img src="/static/qr/{{ qr_image }}" width="200">
 {% else %}
-<p>QR belum diupload</p>
+    <p>QR belum diupload</p>
 {% endif %}
 
 </body>
