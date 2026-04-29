@@ -17,7 +17,7 @@ POSTER_FOLDER = 'static/posters'
 ALLOWED_EXT = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
 
 ADMIN_USERNAME = 'admin'
-ADMIN_PASSWORD = 'cinemax2024'
+ADMIN_PASSWORD = 'cinemax2026'
 
 for folder in [QR_FOLDER, POSTER_FOLDER]:
     if not os.path.exists(folder):
