@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>🎟️ Pesan: {{ movie.title }}</h3>
+<form method="POST" id="bkForm">
+  <div class="row g-3 mb-4">
+    <div class="col-md-3"><label>Bioskop</label><select class="form-select" name="cinema">{% for c in cinemas %}<option>{{ c }}</option>{% endfor %}</select></div>
+    <div class="col-md-3"><label>Tanggal</label><select class="form-select" name="date">{% for d in dates %}<option>{{ d }}</option>{% endfor %}</select></div>
+    <div class="col-md-3"><label>Jam</label><select class="form-select" name="time">{% for t in movie.showtimes %}<option>{{ t }}</option>{% endfor %}</select></div>
+    <div class="col-md-3"><label>Tipe Kursi</label><select class="form-select" name="type" id="typeSel">{% for n,p in prices.items() %}<option value="{{ n }}" data-price="{{ p }}">{{ n }}</option>{% endfor %}</select></div>
+  </div>
+  <div class="alert alert-info">💺 Pilih <b>3-8 kursi</b> per pemesanan.</div>
+  <div class="seat-grid mb-4" id="seatGrid">{% for r in range(1,6) %}{% for c in ['A','B','C','D','E','F','G','H'] %}
+    <div class="seat" data-id="{{ c }}{{ r }}">{{ c }}{{ r }}</div>{% endfor %}{% endfor %}
+  </div>
+  <input type="hidden" name="price" id="priceVal" value="45000">
+  <div class="d-flex justify-content-between align-items-center p-3 bg-dark rounded text-light">
+    <div>Kursi: <span id="selSeats">-</span></div>
+    <div>Total: <b id="totalPrice">Rp 0</b></div>
+    <button type="submit" class="btn btn-danger">Lanjut Bayar →</button>
+  </div>
+</form>
+{% endblock %}
+{% block extra_js %}<script>document.getElementById('typeSel').onchange=e=>document.getElementById('priceVal').value=e.target.selectedOptions[0].dataset.price;</script>{% endblock %}
