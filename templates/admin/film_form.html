@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<form method="POST" enctype="multipart/form-data" class="bg-dark p-4 rounded text-light">
+  <h3>{{ 'Tambah' if act=='add' else 'Edit' }} Film</h3>
+  <div class="row g-3">
+    <div class="col-6"><input name="title" class="form-control" placeholder="Judul" value="{{ movie.title|default('') }}" required></div>
+    <div class="col-3"><input name="genre" class="form-control" placeholder="Genre" value="{{ movie.genre|default('') }}"></div>
+    <div class="col-3"><input name="duration" class="form-control" placeholder="Durasi" value="{{ movie.duration|default('') }}"></div>
+    <div class="col-2"><input name="rating" class="form-control" placeholder="Rating" value="{{ movie.rating|default('13+') }}"></div>
+    <div class="col-2"><input name="score" class="form-control" type="number" step="0.1" value="{{ movie.score|default(8.0) }}"></div>
+    <div class="col-4"><input name="director" class="form-control" placeholder="Sutradara" value="{{ movie.director|default('') }}"></div>
+    <div class="col-4"><input name="cast" class="form-control" placeholder="Pemeran" value="{{ movie.cast|default('') }}"></div>
+    <div class="col-12"><textarea name="description" class="form-control" rows="2">{{ movie.description|default('') }}</textarea></div>
+    <div class="col-12"><input name="showtimes" class="form-control" placeholder="Jam (pisah koma)" value="{{ movie.showtimes|default('10:00,13:00,16:00')|join(', ') }}"></div>
+    <div class="col-6">
+      <label>URL Poster</label><input name="poster_url" class="form-control" value="{{ movie.poster|default('') if not movie.poster.startswith('/') else '' }}">
+    </div>
+    <div class="col-6">
+      <label>Atau Upload Gambar</label><input type="file" name="poster_file" class="form-control" accept="image/*">
+    </div>
+  </div>
+  <button class="btn btn-danger mt-3">💾 Simpan</button>
+  <a href="/admin/films" class="btn btn-secondary mt-3">Batal</a>
+</form>{% endblock %}
