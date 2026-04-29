@@ -1,0 +1,6 @@
+body{background:#0f0f13;color:#fff;font-family:system-ui,sans-serif}
+.seat-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;max-width:400px}
+.seat{height:32px;border-radius:6px;background:#222;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px}
+.seat:hover{background:#333}.seat.selected{background:#e8173a}.seat.taken{background:#444;cursor:not-allowed}
+.navbar-brand{font-weight:800;letter-spacing:1px}
+select{appearance:none;background:#1a1a20 url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fff'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 10px center;padding-right:30px}
